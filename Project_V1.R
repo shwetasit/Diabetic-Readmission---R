@@ -12,6 +12,7 @@ dat1=dat1[,setdiff(colnames(dat),c('examide', 'citoglipton', 'glimepiride.piogli
                                   'metformin'))]
 
 dim(dat1)
+
 #Normalization of variables 
 #dat1<-transform(dat1, encounter_id = log10(dat1$encounter_id))
 #dat1<-transform(dat1, patient_nbr = log10(dat1$patient_nbr))
@@ -20,8 +21,8 @@ dim(dat1)
 
 #dat2=as.data.frame( scale(dat1[,1] ))
 #data.Normalization (dat1$encounter_id,type="n1",normalization="column")
-unique(dat1$gender)
 
+unique(dat1$gender)
 dat2=dat1[!(dat1$gender=='Unknown/Invalid'), ]
 dim(dat2)
 
@@ -171,7 +172,7 @@ table(dat2$number_diagnoses)
 dat2$readmitted=(ifelse(dat2$readmitted<=30, 1,0))
 table(dat2$readmitted)
 
-
+# Data Partition
 set.seed(1)
 id.train = sample(1:nrow(dat2), nrow(dat2)*.6)
 id.test=setdiff(1:nrow(dat2), id.train)
@@ -179,14 +180,7 @@ dat2.train = dat2[id.train,]
 dat2.test = dat2[id.test,]
 #write.csv(dat2,'Cleaned.csv')
 
-
-
-
-
-
-
-
-
+#Model Building
 min.model = glm(readmitted ~ 1, data = dat2.train, family = 'binomial')
 library(pscl)
 pR2(min.model)# r2 of the model
@@ -197,7 +191,7 @@ max.formula = formula(max.model)
 obj = step(min.model, direction='forward', scope=max.formula) # it will print out models in each step
 summary(obj) # it will give you the final model
 #pR2(obj)
-#Odd Ration
+#Odd Ratio
 (exp(coef(obj)))
 require(MASS)
 exp(cbind((coef(obj))) )
